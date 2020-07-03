@@ -17,7 +17,7 @@ streamUrl = "https://www.twitch.tv/tokageki_"
 botWebsiteUrl = "https://instagram.com/tokageki_" #en attendant d'avoir un site pour le bot ^^
 
 
-botToken = "Your token"
+botToken = "Your token here"
 
 
 #définis le préfixe en fonction du serveur
@@ -80,7 +80,8 @@ c.execute("""CREATE TABLE IF NOT EXISTS DELAIS (
         user_id             INTEGER         NOT NULL,
         event_id            VARCHAR(100)    NOT NULL,
         event_name          VARCHAR(100)    NOT NULL,
-        user_event_id       VARCHAR(100)    PRIMARY KEY
+        user_event_id       VARCHAR(100)    PRIMARY KEY,
+        cooldown            INTEGER         NOT NULL
         )""")
 
 #création d'un tableau qui contient les emotes custom que le bot peut utiliser
@@ -123,9 +124,7 @@ async def help(ctx):
             embed.add_field(name="serverlist", value="donne la liste des serveurs sur lequel est le bot (propriétaire du bot seulement)", inline=False)
             embed.add_field(name="listen/play/watch/stream <mot>", value="change le statut du bot (propriétaire du bot seulement)", inline=False)
             embed.add_field(name="addemote <emote>", value="ajoute une emote dans la liste des emotes du bot (propriétaire du bot seulement)", inline=False)
-            embed.add_field(name="heure", value="affiche l'heure Unix", inline=False)
-            addemote
-
+            embed.add_field(name="addanimatedemote <emotename> <emoteid>", value="ajoute une emote animée dans la liste des emotes du bot (propriétaire du bot seulement)", inline=False)
         else :
 
             #Commande help dans un "Embed" de couleur verte
@@ -138,10 +137,10 @@ async def help(ctx):
         embed.add_field(name="delreset <nom de l'event>", value="supprime un event (admins seulement)", inline=False)
         embed.add_field(name="reset list", value="affiche la liste des resets disponibles", inline=False)
         embed.add_field(name="reset <nom de l'event>", value="reset un event (EN COURS DE CRÉATION)", inline=False)
-        embed.add_field(name="shinys <@user(facultatif)>", value="donne la liste des shinys de la personne", inline=False)
-        embed.set_footer(text="TokaPokeBot help")  
+        embed.add_field(name="shiny <@user(facultatif)>", value="donne la liste des shinys de la personne", inline=False)
+        embed.set_footer(text="T-PokeBot help")  
         embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/724993070114013337/725045208655593482/Tokabot.png")
-        embed.set_author(name="TokaPokebot", url=botWebsiteUrl, icon_url="https://cdn.discordapp.com/attachments/724993070114013337/725044258134032475/bowdenfond.jpg")
+        embed.set_author(name="T-Pokebot", url=botWebsiteUrl, icon_url="https://cdn.discordapp.com/attachments/724993070114013337/725044258134032475/bowdenfond.jpg")
         await ctx.channel.send(embed=embed)
         
         #ajoute une emote custom en réaction depuis le tableau "EMOTES"
@@ -159,7 +158,7 @@ async def help(ctx):
 async def addemote(ctx,*,emojiId): #ajoute une emote dans la liste des emotes custom que le bot peut utiliser
     author = ctx.message.author
     if author == bot.get_user(botOwnerId): #verifie que c'est le propriétaire qui utilise la commande 
-        c.execute("INSERT INTO EMOTES VALUES (?,?)", (None,"<a:eevee:725276871100596244>"))
+        c.execute("INSERT INTO EMOTES VALUES (?,?)", (None,emojiId))
         conn.commit()
         embed = discord.Embed(title="EMOTE", description=f"Emote {emojiId} ajoutée", color=0x2e8b57) #valide que l'emote a été ajoutée
         embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/724993070114013337/725413003607932938/DisastrousIllfatedDaddylonglegs-size_restricted.gif")
@@ -187,22 +186,42 @@ async def addanimatedemote(ctx, emoteName, emoteId): #ajoute une emote animée d
         await ctx.channel.send(embed=embed)
 
 
-
 @bot.command()
-async def heure(ctx): #commande de dev à supprimer plus tard -> affiche l'heure Unix
-    heureVar = time.time()  
-    await ctx.send(heureVar)
-    
+@commands.has_permissions(administrator=True)
+async def clearshiny(ctx,member: discord.Member = None):
+    serverId = ctx.guild.id
+    if member == None :
+        member = ctx.message.author
+    userId = member.id
+    c.execute("DELETE FROM USERS_DATA WHERE id_server = ? AND id_user = ?", (serverId,userId))
+    conn.commit()
+    embed = discord.Embed(title="RESETS", description=f"Les resets de cet utilisateur ont été supprimés", color=0x2e8b57) 
+    embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/724993070114013337/725413003607932938/DisastrousIllfatedDaddylonglegs-size_restricted.gif")
+    await ctx.channel.send(embed=embed)
+
+
+@clearshiny.error
+async def clearshiny_error(ctx, error):
+    if isinstance(error, commands.MissingPermissions):
+        embed = discord.Embed(title="ERREUR", description=f"Vous n'avez pas les permissions.", color=0x8B0000)
+        embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/724993070114013337/725405379827204196/giphy_3.gif")
+        await ctx.channel.send(embed=embed)
+
 
 
 @bot.command()
 async def clearemote(ctx):
-    c.execute("DELETE FROM EMOTES")
-    conn.commit()
-    embed = discord.Embed(title="EMOTE", description=f"Les emotes ont été clear", color=0x2e8b57) #valide que l'emote a été ajoutée
-    embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/724993070114013337/725413003607932938/DisastrousIllfatedDaddylonglegs-size_restricted.gif")
-    await ctx.channel.send(embed=embed)
-
+    author = ctx.message.author
+    if author == bot.get_user(botOwnerId): #verifie que c'est le propriétaire qui utilise la commande
+        c.execute("DELETE FROM EMOTES")
+        conn.commit()
+        embed = discord.Embed(title="EMOTE", description=f"Les emotes ont été clear", color=0x2e8b57) #valide que l'emote a été ajoutée
+        embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/724993070114013337/725413003607932938/DisastrousIllfatedDaddylonglegs-size_restricted.gif")
+        await ctx.channel.send(embed=embed)
+    else : 
+        embed = discord.Embed(title="ERREUR", description=f"Vous ne pouvez pas faire cela !", color=0x8B0000)
+        embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/724993070114013337/725405379827204196/giphy_3.gif")
+        await ctx.channel.send(embed=embed)
 
 
 @bot.command()
@@ -212,7 +231,7 @@ async def changeprefix(ctx, mot2):
     server_id = ctx.guild.id
     c.execute("UPDATE SERVER SET prefix = ? WHERE id_server = ?", ((mot2), int(ctx.guild.id),))
     conn.commit()
-    embed = discord.Embed(title="RESET", description=f'Le préfix a été changé pour "{mot2}"', color=0x2e8b57)
+    embed = discord.Embed(title="PREFIX", description=f'Le préfix a été changé pour "{mot2}"', color=0x2e8b57)
     embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/724993070114013337/725413003607932938/DisastrousIllfatedDaddylonglegs-size_restricted.gif")
     await ctx.channel.send(embed=embed)
 
@@ -259,28 +278,27 @@ async def addreset(ctx, event_name, taux, shiny, pas_shiny, delais):
         await ctx.channel.send(embed=embed)
 
 
-@addreset.error
-async def addreset_error(ctx, error):
-    if isinstance(error, commands.MissingPermissions):
-        embed = discord.Embed(title="ERREUR", description=f"Vous n'avez pas les permissions.", color=0x8B0000)
-        embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/724993070114013337/725405379827204196/giphy_3.gif")
-        await ctx.channel.send(embed=embed)
-
-
 
 @bot.command()
 @commands.has_permissions(administrator=True) #supprime un reset de la database
 async def delreset(ctx, event_name) :
     server_id = ctx.guild.id
     event_id = f"{server_id}_{event_name}"
-    try:
-        c.execute("DELETE FROM EVENTS WHERE Event_id = ? ",(event_id,))
-        conn.commit()
-        embed = discord.Embed(title="RESET", description=f"L'event {event_name} a bien été supprimé", color=0x2e8b57)
-        embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/724993070114013337/725413003607932938/DisastrousIllfatedDaddylonglegs-size_restricted.gif")
-        await ctx.channel.send(embed=embed)
-    except:
-        embed = discord.Embed(title="ERREUR", description=f"une erreur s'est produite", color=0x8B0000)
+    c.execute("SELECT COUNT(*) FROM events WHERE Event_id = ?",(event_id,))
+    numberEventWithId = c.fetchone()
+    if numberEventWithId[0] == 1 :
+        try:
+            c.execute("DELETE FROM EVENTS WHERE Event_id = ? ",(event_id,))
+            conn.commit()
+            embed = discord.Embed(title="RESET", description=f"L'event {event_name} a bien été supprimé", color=0x2e8b57)
+            embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/724993070114013337/725413003607932938/DisastrousIllfatedDaddylonglegs-size_restricted.gif")
+            await ctx.channel.send(embed=embed)
+        except:
+            embed = discord.Embed(title="ERREUR", description=f"une erreur s'est produite", color=0x8B0000)
+            embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/724993070114013337/725405379827204196/giphy_3.gif")
+            await ctx.channel.send(embed=embed)
+    else :
+        embed = discord.Embed(title="ERREUR", description=f"Aucun event nommé {event_name} n'a été trouvé.", color=0x8B0000)
         embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/724993070114013337/725405379827204196/giphy_3.gif")
         await ctx.channel.send(embed=embed)
 
@@ -344,7 +362,7 @@ async def play(ctx,*,game):
 
 
 @bot.command() #commande de reset du bot
-async def reset(ctx,*, event_name):
+async def reset(ctx, event_name):
     server = ctx.guild.id
     c.execute("SELECT COUNT(*) FROM EMOTES")
     countOfEmotes = c.fetchone()
@@ -364,28 +382,64 @@ async def reset(ctx,*, event_name):
             await ctx.channel.send(embed=embed)
     else :
         eventID = (f"{server}_{event_name}") #fait l'id de l'event pour le reconnaitre
-        c.execute("SELECT Rate FROM events WHERE Event_id = ?",(eventID,))
-        taux = c.fetchone()
-        c.execute("SELECT Event_name FROM events WHERE Event_id = ?",(eventID,))
-        eventName = c.fetchone()
-        nombrealeatoire = randint(1,taux[0]) #génère un nombre aléatoire, si c'est 1 l'event est shiny
-        if nombrealeatoire == 1 : 
-            c.execute("SELECT Shiny_lien FROM events WHERE Event_id = ?",(eventID,))
-            lienShiny = c.fetchone()
-            embed = discord.Embed(title="RESET", description=f"**Le {eventName[0]} est shiny ! Bravo ! <a:charizardDancing:725281864297873428>**", color=0xd79a10)
-            embed.set_image(url=lienShiny[0])
-            await ctx.channel.send(embed=embed)
-            userId = ctx.message.author.id
-            userName = ctx.message.author
-            serverName = ctx.guild.name
-            c.execute("INSERT INTO USERS_DATA VALUES (?,?,?,?,?,?)", (None,int(userId),int(server),str(event_name),str(userName),str(serverName)))
-            conn.commit() #ajoute le shiny dans la liste des shinys de l'utilisateur
+        userId = ctx.message.author.id
+        userEventId = (f"{userId}_{eventID}")
+        c.execute("SELECT COUNT(*) FROM events WHERE Event_id = ?",(eventID,))
+        numberEventWithId = c.fetchone()
+        if numberEventWithId[0] == 1 :
+            c.execute("SELECT COUNT(*) FROM DELAIS WHERE user_event_id = ?",(userEventId,))
+            number = c.fetchone()
+            if number[0] == 0 :
+                c.execute("INSERT INTO DELAIS VALUES (?,?,?,?,?,?)", (server,userId,eventID,event_name,userEventId,"0"))
+                conn.commit()
+            timestamp = int(time.time())
+            c.execute("SELECT delais FROM events WHERE Event_id = ?",(eventID,))
+            cooldownInMinutes = c.fetchone()
+            cooldownInSeconds = cooldownInMinutes[0] * 60
+            timeResetAllowed = timestamp - cooldownInSeconds
+            c.execute("SELECT cooldown FROM delais WHERE user_event_id = ?",(userEventId,))
+            lastReset = c.fetchone()
+            if lastReset[0] < timeResetAllowed :
+                c.execute("Update delais set cooldown = ? where user_event_id = ?",(timestamp, userEventId))
+                conn.commit()
+                c.execute("SELECT Rate FROM events WHERE Event_id = ?",(eventID,))
+                taux = c.fetchone()
+                c.execute("SELECT Event_name FROM events WHERE Event_id = ?",(eventID,))
+                eventName = c.fetchone()
+                nombrealeatoire = randint(1,taux[0]) #génère un nombre aléatoire, si c'est 1 l'event est shiny
+                if nombrealeatoire == 1 : 
+                    c.execute("SELECT Shiny_lien FROM events WHERE Event_id = ?",(eventID,))
+                    lienShiny = c.fetchone()
+                    embed = discord.Embed(title="RESET", description=f"**Le {eventName[0]} est shiny ! Bravo ! <a:charizardDancing:725281864297873428>**", color=0xd79a10)
+                    embed.set_image(url=lienShiny[0])
+                    await ctx.channel.send(embed=embed)
+                    userName = ctx.message.author
+                    serverName = ctx.guild.name
+                    c.execute("INSERT INTO USERS_DATA VALUES (?,?,?,?,?,?)", (None,int(userId),int(server),str(event_name),str(userName),str(serverName)))
+                    conn.commit() #ajoute le shiny dans la liste des shinys de l'utilisateur
+                else :
+                    c.execute("SELECT Normal_lien FROM events WHERE Event_id = ?",(eventID,))
+                    lienPasShiny = c.fetchone()
+                    embed = discord.Embed(title="RESET", description=f"Le {eventName[0]} n'est pas shiny... Dommage ! <a:pokewalking:725285728765870080>", color=0x2e8b57)
+                    embed.set_image(url=lienPasShiny[0])
+                    await ctx.channel.send(embed=embed)
+            else : 
+                embed = discord.Embed(title="ERREUR", description=f"Vous ne pouvez pas faire cela !", color=0x8B0000)
+                embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/724993070114013337/725405379827204196/giphy_3.gif")
+                timeRemaining = lastReset[0] - timeResetAllowed
+                if timeRemaining < 60 :
+                    embed.add_field(name="temps restant", value=f"vous devez encore attendre {timeRemaining} secondes.", inline=False)
+                else :
+                    timeRemaining = timeRemaining / 60
+                    embed.add_field(name="temps restant", value=f"vous devez encore attendre {int(timeRemaining)} minutes.", inline=False)
+                await ctx.channel.send(embed=embed)
         else :
-            c.execute("SELECT Normal_lien FROM events WHERE Event_id = ?",(eventID,))
-            lienPasShiny = c.fetchone()
-            embed = discord.Embed(title="RESET", description=f"Le {eventName[0]} n'est pas shiny... Dommage ! <a:pokewalking:725285728765870080>", color=0x2e8b57)
-            embed.set_image(url=lienPasShiny[0])
+            embed = discord.Embed(title="ERREUR", description=f"Aucun event nommé {event_name} n'a été trouvé.", color=0x8B0000)
+            embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/724993070114013337/725405379827204196/giphy_3.gif")
             await ctx.channel.send(embed=embed)
+            
+
+
 
 @reset.error
 async def reset_error(ctx, error):
@@ -403,13 +457,14 @@ async def reset_error(ctx, error):
 
 
 @bot.command() #donne la liste des shinys d'une personne
-async def shinys(ctx, member: discord.Member = None):
+async def shiny(ctx, member: discord.Member = None):
+    serverId = ctx.guild.id
     if member == None :
         member = ctx.message.author
     userId = member.id
-    c.execute("SELECT event_name FROM USERS_DATA WHERE id_user = ?",(userId,))
+    c.execute("SELECT event_name FROM USERS_DATA WHERE id_user = ? AND id_server = ?",(userId,serverId))
     resultats = c.fetchall()
-    message = f"**Voici les shinys de {member} :**\n"
+    message = f"**Voici le(s) shiny(s) de {member} sur ce serveur :**\n"
     for resultat in resultats:
         message += str(resultat[0]) + "\n"
     if message != "":
