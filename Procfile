@@ -1,1 +1,1 @@
-worker: pokebot.py 
+worker: python pokebot.py
