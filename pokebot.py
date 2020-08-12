@@ -16,6 +16,8 @@ botOwnerId = 354233934218919941
 streamUrl = "https://www.twitch.tv/tokageki_"
 botWebsiteUrl = "https://instagram.com/tokageki_" #en attendant d'avoir un site pour le bot ^^
 
+from boto.s3.connection import S3Connection
+s3 = S3Connection(os.environ['botToken'])
 
 #botToken = "Your token here"
 
