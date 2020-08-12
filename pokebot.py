@@ -17,7 +17,7 @@ streamUrl = "https://www.twitch.tv/tokageki_"
 botWebsiteUrl = "https://instagram.com/tokageki_" #en attendant d'avoir un site pour le bot ^^
 
 
-botToken = "Your token here"
+#botToken = "Your token here"
 
 
 #définis le préfixe en fonction du serveur
