@@ -12,9 +12,9 @@ import discord
 from discord.ext import commands
 
 
-botOwnerId = 354233934218919941
-streamUrl = "https://www.twitch.tv/tokageki_"
-botWebsiteUrl = "https://instagram.com/tokageki_" #en attendant d'avoir un site pour le bot ^^
+botOwnerId = "your id"
+streamUrl = "your website"
+botWebsiteUrl = "botwebsite" #en attendant d'avoir un site pour le bot ^^
 
 botToken = "Your token here"
 
