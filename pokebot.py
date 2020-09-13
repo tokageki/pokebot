@@ -14,14 +14,14 @@ import discord
 from discord.ext import commands
 import pymongo
 
-myclient = pymongo.MongoClient("<yourConnectionURL forMongodb")
+myclient = pymongo.MongoClient("<Your Mongo Connection URL>")
 mydb = myclient["pokebotdb"]
 
-botInviteLink = "<yourInviteLink>"
+botInviteLink = "<Your invite link>"
 
 
 
-botOwnerId = 354233934218919941
+botOwnerId = <your id>
 streamUrl = "https://www.twitch.tv/tokageki_"
 
 gifError = "https://cdn.discordapp.com/attachments/724993070114013337/725405379827204196/giphy_3.gif"
@@ -29,7 +29,7 @@ gifWarning = "https://cdn.discordapp.com/attachments/724993070114013337/75258681
 gifNoProblem = "https://cdn.discordapp.com/attachments/724993070114013337/725413003607932938/DisastrousIllfatedDaddylonglegs-size_restricted.gif"
 
 
-botToken = "<yourToken>"
+botToken = "<your token>"
 
 
 #define the prefix with the db
@@ -67,24 +67,32 @@ async def on_ready():
 
 #help command
 @bot.command()
-async def help(ctx):
+async def help(ctx, command):
         #Commande help dans un "Embed" de couleur verte
-        #reste des commandes    
-        embed = discord.Embed(title="available commands", description="List of available commands", color=0x2e8b57)
-        embed.add_field(name="help", value="display this menu", inline=False)
-        embed.add_field(name="invite", value="gives the bot invitation link", inline=False)
-        embed.add_field(name="changeprefix <prefix>", value="change the bot prefix (admins only)", inline=False)
-        embed.add_field(name="addreset <eventName> <rate> <shinyImage> <normalImage> <delay in minutes>", value="create a new event (admins only)", inline=False)
-        embed.add_field(name="delreset <eventName>", value="delete the event (admins only)", inline=False)
-        embed.add_field(name="reset list", value="displays the list of available resets", inline=False)
-        embed.add_field(name="reset <eventName>", value="reset an event", inline=False)
-        embed.add_field(name="shiny <@user(optionnal)>", value="give a lists of the user's shinys", inline=False)
-        embed.add_field(name="[support server]", value="https://discord.gg/C9Ju53W", inline=False)
+        #reste des commandes
+        embed = discord.Embed(title=f"available commands", description="List of available commands", color=0x2e8b57)
         embed.set_footer(text="T-PokeBot help")  
         embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/724993070114013337/725045208655593482/Tokabot.png")
         embed.set_author(name="T-Pokebot", url=botInviteLink, icon_url="https://cdn.discordapp.com/attachments/724993070114013337/725044258134032475/bowdenfond.jpg")
+        if command == "bot" :
+            embed.add_field(name=".help", value="display this menu", inline=False)
+            embed.add_field(name=".changeprefix <prefix>", value="change the bot prefix (admins only)", inline=False)
+        elif command == "game" :
+            embed.add_field(name=".reset list", value="displays the list of available resets", inline=False)
+            embed.add_field(name=".reset <eventName>", value="reset an event", inline=False)
+            embed.add_field(name=".shiny <@user(optionnal)>", value="give a lists of the user's shinys", inline=False)
+        elif command == "creation" :
+            embed.add_field(name=".addreset <eventName> <rate> <shinyImage> <normalImage> <delay in minutes>", value="create a new event (admins only)", inline=False)
+            embed.add_field(name=".delreset <eventName>", value="delete the event (admins only)", inline=False)
+        elif command == "info" :
+            embed.add_field(name=".invite", value="gives the bot invitation link", inline=False)
+            embed.add_field(name="[support server]", value="https://discord.gg/C9Ju53W", inline=False)
+        else : 
+            embed.add_field(name="<:settings:754796965774229574> bot configuration", value="```.help bot```", inline=True)
+            embed.add_field(name="<:gamepad:754790281827582074> game", value="```.help game```", inline=True)
+            embed.add_field(name="🖌️ event creation", value="```.help creation```", inline=True)
+            embed.add_field(name="<:info:754797358415347742> bot info", value="```.help info```", inline=True)
         await ctx.channel.send(embed=embed)
-
         #display developpement commands
         author = ctx.message.author
         if author == bot.get_user(botOwnerId):
@@ -95,9 +103,7 @@ async def help(ctx):
             embed.add_field(name="listen/play/watch/stream <mot>", value="change bot status (bot owner only)", inline=False)
             embed.add_field(name="addemote <emote>", value="add an emote to the bot emote list (bot owner only)", inline=False)
             embed.add_field(name="addanimatedemote <emotename> <emoteid>", value="add an animated emote to the bot emote list (bot owner only)", inline=False)
-            await ctx.channel.send(embed=embed)
-
-        
+            await ctx.channel.send(embed=embed)            
         #add a custom emote in reaction
         mycol = mydb["emotes"]
         numberOfEmotes = mycol.find_one()
@@ -109,6 +115,20 @@ async def help(ctx):
             await ctx.channel.send(embed=embed)
         else :
             await ctx.message.add_reaction(emote)
+
+                              
+@help.error
+async def help_error(ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+        embed = discord.Embed(title=f"available commands", description="List of available commands", color=0x2e8b57)
+        embed.set_footer(text="T-PokeBot help")  
+        embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/724993070114013337/725045208655593482/Tokabot.png")
+        embed.set_author(name="T-Pokebot", url=botInviteLink, icon_url="https://cdn.discordapp.com/attachments/724993070114013337/725044258134032475/bowdenfond.jpg")
+        embed.add_field(name="<:settings:754796965774229574> bot configuration", value="```.help bot```", inline=True)
+        embed.add_field(name="<:gamepad:754790281827582074> game", value="```.help game```", inline=True)
+        embed.add_field(name="🖌️ event creation", value="```.help creation```", inline=True)
+        embed.add_field(name="<:info:754797358415347742> bot info", value="```.help info```", inline=True)
+        await ctx.channel.send(embed=embed)
 
 
 #migration faite
@@ -439,3 +459,4 @@ try:
     loop.run_until_complete(bot.start(botToken))  
 except KeyboardInterrupt:
     loop.run_until_complete(bot.logout())
+
