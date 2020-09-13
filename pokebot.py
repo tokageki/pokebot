@@ -74,7 +74,7 @@ async def help(ctx, command):
         embed.set_footer(text="T-PokeBot help")  
         embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/724993070114013337/725045208655593482/Tokabot.png")
         embed.set_author(name="T-Pokebot", url=botInviteLink, icon_url="https://cdn.discordapp.com/attachments/724993070114013337/725044258134032475/bowdenfond.jpg")
-        if command == "bot" :
+        if command == "config" :
             embed.add_field(name=".help", value="display this menu", inline=False)
             embed.add_field(name=".changeprefix <prefix>", value="change the bot prefix (admins only)", inline=False)
         elif command == "game" :
@@ -88,7 +88,7 @@ async def help(ctx, command):
             embed.add_field(name=".invite", value="gives the bot invitation link", inline=False)
             embed.add_field(name="[support server]", value="https://discord.gg/C9Ju53W", inline=False)
         else : 
-            embed.add_field(name="<:settings:754796965774229574> bot configuration", value="```.help bot```", inline=True)
+            embed.add_field(name="<:settings:754796965774229574> bot configuration", value="```.help config```", inline=True)
             embed.add_field(name="<:gamepad:754790281827582074> game", value="```.help game```", inline=True)
             embed.add_field(name="🖌️ event creation", value="```.help creation```", inline=True)
             embed.add_field(name="<:info:754797358415347742> bot info", value="```.help info```", inline=True)
@@ -124,7 +124,7 @@ async def help_error(ctx, error):
         embed.set_footer(text="T-PokeBot help")  
         embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/724993070114013337/725045208655593482/Tokabot.png")
         embed.set_author(name="T-Pokebot", url=botInviteLink, icon_url="https://cdn.discordapp.com/attachments/724993070114013337/725044258134032475/bowdenfond.jpg")
-        embed.add_field(name="<:settings:754796965774229574> bot configuration", value="```.help bot```", inline=True)
+        embed.add_field(name="<:settings:754796965774229574> bot configuration", value="```.help config```", inline=True)
         embed.add_field(name="<:gamepad:754790281827582074> game", value="```.help game```", inline=True)
         embed.add_field(name="🖌️ event creation", value="```.help creation```", inline=True)
         embed.add_field(name="<:info:754797358415347742> bot info", value="```.help info```", inline=True)
