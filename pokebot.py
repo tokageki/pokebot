@@ -377,7 +377,7 @@ async def reset(ctx, event_name):
                 if timeRemaining < 60 :
                     embed.add_field(name="TIME LEFT", value=f"Please wait {timeRemaining} second(s) before using this command again.", inline=False)
                 else :
-                    timeRemaining = timeRemaining / 60
+                    timeRemaining = timeRemaining // 60
                     embed.add_field(name="TIME LEFT", value=f"Please wait {timeRemaining} minute(s) before using this command again.", inline=False)
                 await ctx.channel.send(embed=embed)
 
