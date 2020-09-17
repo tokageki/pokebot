@@ -4,7 +4,7 @@ from discord.ext.commands import has_permissions, CheckFailure
 from random import randint
 import asyncio
 import time
-from random import randint
+
 
 
 
