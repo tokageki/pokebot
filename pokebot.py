@@ -10,8 +10,7 @@ import discord
 from discord.ext import commands
 import pymongo
 
-myclient = pymongo.MongoClient(
-    "<your mongo connect url")
+myclient = pymongo.MongoClient("<your mongo connect url")
 mydb = myclient["pokebotdb"]
 
 botInviteLink = "<your invite link>"
