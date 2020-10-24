@@ -95,10 +95,10 @@ async def help(ctx, command):
     elif command == "info":
         embed.add_field(name="```.invite```", value="gives the bot invitation link", inline=False)
         embed.add_field(name="[support server]",
-                        value="[click here <a:pokewalking:725285728765870080>](https://discord.gg/C9Ju53W)",
+                        value="[click here](https://discord.gg/C9Ju53W)",
                         inline=False)
         embed.add_field(name="[please vote for this bot on top.gg]",
-                        value="[click here <a:charizardDancing:725281864297873428>](https://top.gg/bot/693436830627921942/vote)",
+                        value="[click here](https://top.gg/bot/693436830627921942/vote)",
                         inline=False)
     else:
         embed.add_field(name="<:settings:754796965774229574> bot configuration", value="```.help config```", inline=True)
@@ -469,7 +469,7 @@ async def lreset(ctx, event_name):
 
                 if nombrealeatoire == 1:
                     embed = discord.Embed(title="RESET",
-                                          description=f"**The {data['resetName']} is shiny ! Well done ! <a:charizardDancing:725281864297873428>**",
+                                          description=f"**The {data['resetName']} is shiny ! Well done !**",
                                           color=0xd79a10)
                     lien = data["lienShiny"]
                     embed.set_image(url=lien)
@@ -482,7 +482,7 @@ async def lreset(ctx, event_name):
                 else:
                     lien = data["lienNormal"]
                     embed = discord.Embed(title="RESET",
-                                          description=f"The {data['resetName']} is not shiny ... it will be for another time ! <a:pokewalking:725285728765870080>",
+                                          description=f"The {data['resetName']} is not shiny ... it will be for another time !",
                                           color=0x2e8b57)
                     embed.set_image(url=lien)
                     await ctx.channel.send(embed=embed)
@@ -558,7 +558,7 @@ async def reset(ctx, event_name):
 
                 if nombrealeatoire == 1:
                     embed = discord.Embed(title="RESET",
-                                          description=f"**The {data['resetName']} is shiny ! Well done ! <a:charizardDancing:725281864297873428>**",
+                                          description=f"**The {data['resetName']} is shiny ! Well done !**",
                                           color=0xd79a10)
                     lien = data["lienShiny"]
                     embed.set_image(url=lien)
@@ -571,7 +571,7 @@ async def reset(ctx, event_name):
                 else:
                     lien = data["lienNormal"]
                     embed = discord.Embed(title="RESET",
-                                          description=f"The {data['resetName']} is not shiny ... it will be for another time ! <a:pokewalking:725285728765870080>",
+                                          description=f"The {data['resetName']} is not shiny ... it will be for another time !",
                                           color=0x2e8b57)
                     embed.set_image(url=lien)
                     await ctx.channel.send(embed=embed)
