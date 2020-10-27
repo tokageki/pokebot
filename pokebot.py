@@ -10,7 +10,7 @@ import discord
 from discord.ext import commands
 import pymongo
 
-myclient = pymongo.MongoClient("<your mongo connect url")
+myclient = pymongo.MongoClient("<your mongo connect url>")
 mydb = myclient["pokebotdb"]
 
 botInviteLink = "<your invite link>"
@@ -18,10 +18,9 @@ botInviteLink = "<your invite link>"
 botOwnerId = <your id>
 streamUrl = "<your stream url>"
 
-gifError = "<image or gif url>"
-gifWarning = "<image or gif url>"
-gifNoProblem = "<image or gif url>"
-
+gifError = "<your error gif>"
+gifWarning = "<your warning gif>"
+gifNoProblem = "<your no problem gif>"
 
 botToken = "<your bot token>"
 
@@ -51,7 +50,7 @@ bot.remove_command("help")
 async def on_ready():
     # Définition du jeu du bot sur ".help"
     await bot.change_presence(status=discord.Status.online,
-                              activity=discord.Game(f'check .help ! | {len(bot.guilds)} servers!'))
+                              activity=discord.Game(f'NEW FEATURES, check .help ! | {len(bot.guilds)} servers! Goal : 75 !'))
     # Affiche que la connection a bien été effectuée
     print(f'connected as {bot.user} with mongodb.')
 
@@ -59,13 +58,13 @@ async def on_ready():
 @bot.event
 async def on_guild_join(guild):
     await bot.change_presence(status=discord.Status.online,
-                              activity=discord.Game(f'check .help ! | {len(bot.guilds)} servers!'))
+                              activity=discord.Game(f'NEW FEATURES, check .help ! | {len(bot.guilds)} servers! Goal : 75 !'))
 
 
 @bot.event
 async def on_guild_remove(guild):
     await bot.change_presence(status=discord.Status.online,
-                              activity=discord.Game(f'check .help ! | {len(bot.guilds)} servers!'))
+                              activity=discord.Game(f'NEW FEATURES, check .help ! | {len(bot.guilds)} servers! Goal : 75 !'))
 
 
 # help command
@@ -76,7 +75,8 @@ async def help(ctx, command):
     embed = discord.Embed(title=f"available commands", description="List of available commands", color=0x2e8b57)
     embed.set_footer(text="T-PokeBot help")
     embed.set_thumbnail(url=bot.user.avatar_url)
-    embed.set_author(name="T-Pokebot", url=botInviteLink)
+    embed.set_author(name="T-Pokebot", url=botInviteLink,
+                     icon_url="https://cdn.discordapp.com/attachments/724993070114013337/725044258134032475/bowdenfond.jpg")
     if command == "config":
         embed.add_field(name="```.help```", value="display this menu", inline=False)
         embed.add_field(name="```.changeprefix <prefix>```", value="change the bot prefix (admins only)", inline=False)
@@ -84,28 +84,25 @@ async def help(ctx, command):
         embed.add_field(name="```.reset list```", value="displays the list of available resets", inline=False)
         embed.add_field(name="```.reset <eventName>```", value="reset an event", inline=False)
         embed.add_field(name="```.shiny <@user(optionnal)>```", value="give a lists of the user's shinys", inline=False)
-    elif command == "lgame":
-        embed.add_field(name="```.lreset list```", value="displays the list of available resets", inline=False)
-        embed.add_field(name="```.lreset <eventName>```", value="reset an event", inline=False)
-        embed.add_field(name="```.lshiny <@user(optionnal)>```", value="give a lists of the user's shinys", inline=False)
     elif command == "creation":
         embed.add_field(name="```.addreset <eventName> <rate> <shinyImage> <normalImage> <delay in minutes>```",
                         value="create a new event (admins only)", inline=False)
         embed.add_field(name="```.delreset <eventName>```", value="delete the event (admins only)", inline=False)
+        embed.add_field(name="```.clearshiny```", value="delete all the shiny for a user", inline=False)
     elif command == "info":
-        embed.add_field(name="```.invite```", value="gives the bot invitation link", inline=False)
-        embed.add_field(name="[support server]",
-                        value="[click here](https://discord.gg/C9Ju53W)",
-                        inline=False)
+        embed.add_field(name="[bot invite link]", value="[click here](https://discord.com/oauth2/authorize?client_id=693436830627921942&permissions=268823616&scope=bot)", inline=False)
+        embed.add_field(name="[support server]",value="[click here](https://discord.gg/C9Ju53W)",inline=False)
         embed.add_field(name="[please vote for this bot on top.gg]",
                         value="[click here](https://top.gg/bot/693436830627921942/vote)",
                         inline=False)
+        embed.add_field(name="[github link]",value="[click here](https://github.com/tokageki/pokebot)",inline=False)
+        embed.add_field(name="[contact creator]",value="[twitter](https://twitter.com/tokageki)\n[instagram](https://instagram.com/tokageki_)",inline=False)
+        embed.add_field(name="[bot profile picture artist]",value="[Corsiak](https://www.furaffinity.net/user/corsiak/)",inline=False)
     else:
-        embed.add_field(name="<:settings:754796965774229574> bot configuration", value="```.help config```", inline=True)
-        embed.add_field(name="<:gamepad:754790281827582074> game", value="```.help game```", inline=True)
-        embed.add_field(name="🎮 local game", value="```.help lgame```", inline=True)
-        embed.add_field(name="🖌️ event creation", value="```.help creation```", inline=True)
-        embed.add_field(name="<:info:754797358415347742> bot info", value="```.help info```", inline=True)
+        embed.add_field(name="bot configuration", value="```.help config```", inline=True)
+        embed.add_field(name="game", value="```.help game```", inline=True)
+        embed.add_field(name="event creation", value="```.help creation```", inline=True)
+        embed.add_field(name="bot info", value="```.help info```", inline=True)
     await ctx.channel.send(embed=embed)
     # display developpement commands
     author = ctx.message.author
@@ -147,16 +144,14 @@ async def help_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
         embed = discord.Embed(title=f"available commands", description="List of available commands", color=0x2e8b57)
         embed.set_footer(text="T-PokeBot help")
-        embed.set_thumbnail(
-            url="https://cdn.discordapp.com/attachments/724993070114013337/725045208655593482/Tokabot.png")
+        embed.set_thumbnail(url=bot.user.avatar_url)
         embed.set_author(name="T-Pokebot", url=botInviteLink,
                          icon_url="https://cdn.discordapp.com/attachments/724993070114013337/725044258134032475/bowdenfond.jpg")
-        embed.add_field(name="<:settings:754796965774229574> bot configuration", value="```.help config```",
+        embed.add_field(name="bot configuration", value="```.help config```",
                         inline=True)
-        embed.add_field(name="<:gamepad:754790281827582074> game", value="```.help game```", inline=True)
-        embed.add_field(name="🎮 local game", value="```.help lgame```", inline=True)
-        embed.add_field(name="🖌️ event creation", value="```.help creation```", inline=True)
-        embed.add_field(name="<:info:754797358415347742> bot info", value="```.help info```", inline=True)
+        embed.add_field(name="game", value="```.help game```", inline=True)
+        embed.add_field(name="event creation", value="```.help creation```", inline=True)
+        embed.add_field(name="bot info", value="```.help info```", inline=True)
         await ctx.channel.send(embed=embed)
         # add a custom emote in reaction
         mycol = mydb["emotes"]
@@ -224,15 +219,6 @@ async def addanimatedemote_error(ctx, error):
         embed.set_thumbnail(url=gifError)
         await ctx.channel.send(embed=embed)
 
-
-@bot.command()
-async def invite(ctx):
-    embed = discord.Embed(title="bot invite link", description=botInviteLink, color=0x2e8b57)
-    embed.set_footer(text="T-PokeBot invite link")
-    embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/724993070114013337/725045208655593482/Tokabot.png")
-    embed.set_author(name="T-Pokebot", url=botInviteLink,
-                     icon_url="https://cdn.discordapp.com/attachments/724993070114013337/725044258134032475/bowdenfond.jpg")
-    await ctx.channel.send(embed=embed)
 
 
 @bot.command()
@@ -420,13 +406,19 @@ async def play(ctx, *, game):
 
 
 @bot.command()  # reset command
-async def lreset(ctx, event_name):
+async def reset(ctx, event_name):
     mycol = mydb["resets"]
     # display the list of event if event name == list
     eventAvailable = False
     if event_name == None or event_name == "list":
         myquery = {"serverId": ctx.guild.id}
-        message = "__**Current events:**__\n"
+        message = "__**Current globals events :**__\n"
+        eventAvailable = False
+        for resultat in mycol.find(myquery):
+            message += resultat["resetName"] + "\n"
+            eventAvailable=True
+        myquery = {"serverId": ctx.guild.id}
+        message += "\n__**Current locals events :**__\n"
         for resultat in mycol.find(myquery):
             message += resultat["resetName"] + "\n"
             eventAvailable=True
@@ -445,6 +437,7 @@ async def lreset(ctx, event_name):
         myquery = {"resetId": eventID}
         result = mycol.find_one(myquery)
         if result != None:
+            eventAvailable = True
             mycolDelais = mydb["delais"]
             isDelaisCreated = mycolDelais.find_one({"userEventId": userEventId})
             if isDelaisCreated == None:
@@ -476,7 +469,7 @@ async def lreset(ctx, event_name):
                     await ctx.channel.send(embed=embed)
                     mycolShinyUser = mydb["userData"]
                     mydict = {"userId": userId, "serverId": ctx.guild.id, "eventName": event_name,
-                              "userName": ctx.message.author.name, "serverName": ctx.guild.name}
+                              "userName": ctx.message.author.name, "serverName": ctx.guild.name, "lienShiny":data["lienShiny"]}
                     mycolShinyUser.insert_one(mydict)
 
                 else:
@@ -501,100 +494,76 @@ async def lreset(ctx, event_name):
                                     value=f"Please wait {timeRemaining} minute(s) before using this command again.",
                                     inline=False)
                 await ctx.channel.send(embed=embed)
-
         else:
-            embed = discord.Embed(title="ERROR", description=f"No event named {event_name} was found.", color=0x8B0000)
-            embed.set_thumbnail(url=gifError)
-            await ctx.channel.send(embed=embed)
+            eventID = (f"{0}_{event_name}")  # fait l'id de l'event pour le reconnaitre
+            userId = ctx.message.author.id
+            userEventId = (f"{userId}_{eventID}")
+            myquery = {"resetId": eventID}
+            result = mycol.find_one(myquery)
+            if result != None:
+                eventAvailable = True
+                mycolDelais = mydb["delais"]
+                isDelaisCreated = mycolDelais.find_one({"userEventId": userEventId})
+                if isDelaisCreated == None:
+                    mydict = {"serverId": 0, "userId": userId, "eventId": eventID, "eventName": event_name,
+                              "userEventId": userEventId, "cooldown": 0, "username": ctx.message.author.name}
+                    mycolDelais.insert_one(mydict)
 
-
-@bot.command()  # reset command
-async def reset(ctx, event_name):
-    mycol = mydb["resets"]
-    eventAvailable = False
-    # display the list of event if event name == list
-    if event_name == None or event_name == "list":
-        myquery = {"serverId": 0}
-        message = "__**Current global events:**__\n"
-        for resultat in mycol.find(myquery):
-            message += resultat["resetName"] + "\n"
-            eventAvailable=True
-        if eventAvailable == True:
-            embed = discord.Embed(title="RESET", description=message, color=0x2e8b57)
-            embed.set_thumbnail(url=gifNoProblem)
-            await ctx.channel.send(embed=embed)
-        else :
-            embed = discord.Embed(title="MISSING ARGUMENT", description="No event available.", color=0x8B0000)
-            embed.set_thumbnail(url=gifNoProblem)
-            await ctx.channel.send(embed=embed)
-    else:
-        eventID = (f"0_{event_name}")  # fait l'id de l'event pour le reconnaitre
-        userId = ctx.message.author.id
-        userEventId = (f"{userId}_{eventID}")
-        myquery = {"resetId": eventID}
-        result = mycol.find_one(myquery)
-        if result != None:
-            mycolDelais = mydb["delais"]
-            isDelaisCreated = mycolDelais.find_one({"userEventId": userEventId})
-            if isDelaisCreated == None:
-                mydict = {"serverId": 0, "userId": userId, "eventId": eventID, "eventName": event_name,
-                          "userEventId": userEventId, "cooldown": 0, "username": ctx.message.author.name}
-                mycolDelais.insert_one(mydict)
-
-            timestamp = int(time.time())
-            myquery = {"userEventId": userEventId}
-            lastReset = mycolDelais.find_one(myquery)["cooldown"]
-            cooldownInMinutes = int(mycol.find_one({"resetId": eventID})["delais"])
-            cooldownInSeconds = cooldownInMinutes * 60
-            timeResetAllowed = timestamp - cooldownInSeconds
-            if lastReset <= timeResetAllowed:
+                timestamp = int(time.time())
                 myquery = {"userEventId": userEventId}
-                newvalues = {"$set": {"cooldown": timestamp}}
-                mycolDelais.update_one(myquery, newvalues)
+                lastReset = mycolDelais.find_one(myquery)["cooldown"]
+                cooldownInMinutes = int(mycol.find_one({"resetId": eventID})["delais"])
+                cooldownInSeconds = cooldownInMinutes * 60
+                timeResetAllowed = timestamp - cooldownInSeconds
+                if lastReset <= timeResetAllowed:
+                    myquery = {"userEventId": userEventId}
+                    newvalues = {"$set": {"cooldown": timestamp}}
+                    mycolDelais.update_one(myquery, newvalues)
 
-                myquery = {"resetId": eventID}
-                data = mycol.find_one(myquery)
-                nombrealeatoire = randint(1, int(data["taux"]))
+                    myquery = {"resetId": eventID}
+                    data = mycol.find_one(myquery)
+                    nombrealeatoire = randint(1, int(data["taux"]))
 
-                if nombrealeatoire == 1:
-                    embed = discord.Embed(title="RESET",
-                                          description=f"**The {data['resetName']} is shiny ! Well done !**",
-                                          color=0xd79a10)
-                    lien = data["lienShiny"]
-                    embed.set_image(url=lien)
-                    await ctx.channel.send(embed=embed)
-                    mycolShinyUser = mydb["userData"]
-                    mydict = {"userId": userId, "serverId": 0, "eventName": event_name,
-                              "userName": ctx.message.author.name, "serverName": "global"}
-                    mycolShinyUser.insert_one(mydict)
+                    if nombrealeatoire == 1:
+                        embed = discord.Embed(title="RESET",
+                                              description=f"**The {data['resetName']} is shiny ! Well done !**",
+                                              color=0xd79a10)
+                        lien = data["lienShiny"]
+                        embed.set_image(url=lien)
+                        await ctx.channel.send(embed=embed)
+                        mycolShinyUser = mydb["userData"]
+                        mydict = {"userId": userId, "serverId": 0, "eventName": event_name,
+                                  "userName": ctx.message.author.name, "serverName": ctx.guild.name, "lienShiny":data["lienShiny"]}
+                        mycolShinyUser.insert_one(mydict)
+
+                    else:
+                        lien = data["lienNormal"]
+                        embed = discord.Embed(title="RESET",
+                                              description=f"The {data['resetName']} is not shiny ... it will be for another time !",
+                                              color=0x2e8b57)
+                        embed.set_image(url=lien)
+                        await ctx.channel.send(embed=embed)
 
                 else:
-                    lien = data["lienNormal"]
-                    embed = discord.Embed(title="RESET",
-                                          description=f"The {data['resetName']} is not shiny ... it will be for another time !",
-                                          color=0x2e8b57)
-                    embed.set_image(url=lien)
+                    embed = discord.Embed(title="ERROR", description=f"You can't do this !", color=0x8B0000)
+                    embed.set_thumbnail(url=gifError)
+                    timeRemaining = lastReset - timeResetAllowed
+                    if timeRemaining < 60:
+                        embed.add_field(name="TIME LEFT",
+                                        value=f"Please wait {timeRemaining} second(s) before using this command again.",
+                                        inline=False)
+                    else:
+                        timeRemaining = timeRemaining // 60
+                        embed.add_field(name="TIME LEFT",
+                                        value=f"Please wait {timeRemaining} minute(s) before using this command again.",
+                                        inline=False)
                     await ctx.channel.send(embed=embed)
-
-            else:
-                embed = discord.Embed(title="ERROR", description=f"You can't do this !", color=0x8B0000)
-                embed.set_thumbnail(url=gifError)
-                timeRemaining = lastReset - timeResetAllowed
-                if timeRemaining < 60:
-                    embed.add_field(name="TIME LEFT",
-                                    value=f"Please wait {timeRemaining} second(s) before using this command again.",
-                                    inline=False)
-                else:
-                    timeRemaining = timeRemaining // 60
-                    embed.add_field(name="TIME LEFT",
-                                    value=f"Please wait {timeRemaining} minute(s) before using this command again.",
-                                    inline=False)
-                await ctx.channel.send(embed=embed)
-
-        else:
+        if eventAvailable == False:
             embed = discord.Embed(title="ERROR", description=f"No event named {event_name} was found.", color=0x8B0000)
             embed.set_thumbnail(url=gifError)
             await ctx.channel.send(embed=embed)
+
+
 
 @reset.error
 async def reset_error(ctx, error):
@@ -602,27 +571,13 @@ async def reset_error(ctx, error):
                   commands.MissingRequiredArgument):  # si aucun argument n'est donné, le bot donne la liste des events
         mycol = mydb["resets"]
         myquery = {"serverId": 0}
-        message = "**Missing argument**\n\n__**Current global events :**__\n"
+        message = "\n__**Current globals events :**__\n"
         eventAvailable = False
         for resultat in mycol.find(myquery):
             message += resultat["resetName"] + "\n"
             eventAvailable=True
-        if eventAvailable == True:
-            embed = discord.Embed(title="RESET", description=message, color=0x2e8b57)
-            embed.set_thumbnail(url=gifNoProblem)
-            await ctx.channel.send(embed=embed)
-        else :
-            embed = discord.Embed(title="MISSING ARGUMENT", description="No event available.", color=0x8B0000)
-            embed.set_thumbnail(url=gifNoProblem)
-            await ctx.channel.send(embed=embed)
-
-@lreset.error
-async def lreset_error(ctx, error):
-    if isinstance(error,commands.MissingRequiredArgument):  # si aucun argument n'est donné, le bot donne la liste des events
-        mycol = mydb["resets"]
-        eventAvailable = False
         myquery = {"serverId": ctx.guild.id}
-        message = "**Missing argument**\n\n__**Current events :**__\n"
+        message += "\n__**Current locals events :**__\n"
         for resultat in mycol.find(myquery):
             message += resultat["resetName"] + "\n"
             eventAvailable=True
@@ -644,14 +599,13 @@ async def shiny(ctx, member: discord.Member = None):
         member = ctx.message.author
     mycol = mydb["userData"]
     myquery = {"userId": member.id, "serverId": 0}
-    message = f"**list of {member}'s shiny(s) :**\n```"
+    message = f"**list of {member}'s shiny(s) :**\n"
     for resultat in mycol.find(myquery):
-        print(resultat["eventName"])
-        message += resultat["eventName"] + "\n"
+        message += '\n' + f"[{resultat['eventName']}]({resultat['lienShiny']})"
         dataOn = True
     if dataOn == True:
-        embed = discord.Embed(title="SHINYS", description=message+"```", color=0xFF7F00)
-        embed.set_thumbnail(url=gifWarning)
+        embed = discord.Embed(title="SHINYS", description=message, color=0xFF7F00)
+        embed.set_thumbnail(url=member.avatar_url)
         await ctx.channel.send(embed=embed)
     else :
         embed = discord.Embed(title="SHINYS", description=f"{member} dont have any shiny !", color=0xFF7F00)
@@ -666,14 +620,13 @@ async def lshiny(ctx, member: discord.Member = None):
         member = ctx.message.author
     mycol = mydb["userData"]
     myquery = {"userId": member.id, "serverId": ctx.guild.id}
-    message = f"**list of {member}'s shiny(s) on this server :**\n```"
+    message = f"**list of {member}'s shiny(s) on this server :**\n"
     for resultat in mycol.find(myquery):
-        print(resultat["eventName"])
-        message += resultat["eventName"] + "\n"
+        message += '\n' + f"[{resultat['eventName']}]({resultat['lienShiny']})"
         dataOn = True
     if dataOn == True:
-        embed = discord.Embed(title="SHINYS", description=message+"```", color=0xFF7F00)
-        embed.set_thumbnail(url=gifWarning)
+        embed = discord.Embed(title="SHINYS", description=message, color=0xFF7F00)
+        embed.set_thumbnail(url=member.avatar_url)
         await ctx.channel.send(embed=embed)
     else :
         embed = discord.Embed(title="SHINYS", description=f"{member} dont have any shiny !", color=0xFF7F00)
@@ -702,24 +655,29 @@ async def clearshiny(ctx, member: discord.Member = None):
 
 # migration manquante
 @bot.command()
-@commands.has_permissions(administrator=True)
 async def globalclearshiny(ctx, member: discord.Member = None):
-    if member == None:
-        member = ctx.message.author
-    mycol = mydb["userData"]
-    myquery = {"serverId": 0}
-    numberOfEvent = mycol.find_one(myquery)
-    if numberOfEvent == None:
-        embed = discord.Embed(title="ERROR", description=f"No shiny was found in {member.name}'s list.", color=0x8B0000)
+    if ctx.message.author == bot.get_user(botOwnerId):
+        if member == None:
+            member = ctx.message.author
+        mycol = mydb["userData"]
+        myquery = {"serverId": 0}
+        numberOfEvent = mycol.find_one(myquery)
+        if numberOfEvent == None:
+            embed = discord.Embed(title="ERROR", description=f"No shiny was found in {member.name}'s list.", color=0x8B0000)
+            embed.set_thumbnail(url=gifError)
+            await ctx.channel.send(embed=embed)
+        else:
+            numberOfEvent = mycol.delete_one(myquery)
+            embed = discord.Embed(title="SHINYS", description=f"{member.name}'s shinys have been deleted", color=0x2e8b57)
+            embed.set_thumbnail(url=gifNoProblem)
+            await ctx.channel.send(embed=embed)
+    else:
+        embed = discord.Embed(title="ERROR", description=f"You can't do this !", color=0x8B0000)
         embed.set_thumbnail(url=gifError)
         await ctx.channel.send(embed=embed)
-    else:
-        numberOfEvent = mycol.delete_one(myquery)
-        embed = discord.Embed(title="SHINYS", description=f"{member.name}'s shinys have been deleted", color=0x2e8b57)
-        embed.set_thumbnail(url=gifNoProblem)
-        await ctx.channel.send(embed=embed)
-
-
+        
+        
+    
 @clearshiny.error
 async def clearshiny_error(ctx, error):
     if isinstance(error, commands.MissingPermissions):
@@ -727,12 +685,7 @@ async def clearshiny_error(ctx, error):
         embed.set_thumbnail(url=gifError)
         await ctx.channel.send(embed=embed)
 
-@clearshiny.error
-async def globalclearshiny_error(ctx, error):
-    if isinstance(error, commands.MissingPermissions):
-        embed = discord.Embed(title="ERROR", description=f"You can't do this !", color=0x8B0000)
-        embed.set_thumbnail(url=gifError)
-        await ctx.channel.send(embed=embed)
+
 
 loop = asyncio.get_event_loop()  # Create main loop
 try:
