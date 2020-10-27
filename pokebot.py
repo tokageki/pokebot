@@ -106,7 +106,7 @@ async def help(ctx, command):
     await ctx.channel.send(embed=embed)
     # display developpement commands
     author = ctx.message.author
-    if author == bot.get_user(botOwnerId) and command == "toka":
+    if author == bot.get_user(botOwnerId) and command == "creator":
         # Commande help dans un "Embed" de couleur rouge ne s'affichant que quand l'utilisateur entrant la commande est le propriétaire du bot
         # Cela me permet d'avoir dans mon help mes commandes de configuration du bot, étant bloquées pour les autres, ils n'ont pas besoin de les voir
         embed = discord.Embed(title="developpement commands", description="list of developpement commands",
